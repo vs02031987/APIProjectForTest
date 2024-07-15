@@ -1,29 +1,61 @@
 using APIProjectForTest;
+using APIProjectForTest.DBContexts;
+using APIProjectForTest.Repository;
+using HotChocolate;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using System;
 
-var builder = WebApplication.CreateBuilder(args);
+internal class Program
+{
+    private static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+        // Add services to the container.
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services
-    .AddGraphQLServer()
-    .AddQueryType<Query>();
-var app = builder.Build();
+        builder
+           .Services
+           .AddCors(options =>
+           {
+               options.AddDefaultPolicy(builder =>
+               {
+                   builder
+                       .WithOrigins("https://studio.apollographql.com")
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
+               });
+           });
+        builder.Services.AddControllers();
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+        builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+        builder.Services.
+            AddDbContext<StudentContext>(x =>
+            x.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDBConnection")));
+        builder.Services
+          .AddGraphQLServer()
+          .AddQueryType<Query>()
+          .AddMutationType<Mutation>();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+        var app = builder.Build();
 
-//app.UseHttpsRedirection();
+        // Configure the HTTP request pipeline.
+        //if (app.Environment.IsDevelopment())
+        //{
+        //    app.UseSwagger();
+        //    app.UseSwaggerUI();
+        //}
 
-//app.UseAuthorization();
+        //app.UseHttpsRedirection();
 
-//app.MapControllers();
-app.MapGraphQL();
-app.Run();
+        //app.UseAuthorization();
+
+        //app.MapControllers();
+        app.UseCors();
+        app.MapGraphQL();
+        app.Run();
+    }
+}

@@ -1,17 +1,21 @@
-﻿namespace APIProjectForTest.Model
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace APIProjectForTest.Model
 {
     public class Student
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        [MaxLength(100)]
+        public string? Name { get; set; }
         public int Age { get; set; }
-        public string Gender { get; set; }
+        [MaxLength(10)]
+        public string? Gender { get; set; }
         public Course CourseName { get; set; }
 
     }
     public enum Course {
-        Math,
-        Biology,
-        Commerce
+        Math=1,
+        Biology=2,
+        Commerce=3
     }
 }

@@ -1,4 +1,5 @@
 ﻿using APIProjectForTest.Model;
+using APIProjectForTest.Repository;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +7,11 @@ namespace APIProjectForTest
 {
     public class Query
     {
+        //private readonly IStudentRepository _studentRepository;
+        //public Query(IStudentRepository studentRepository)
+        //{
+        //    _studentRepository = studentRepository;
+        //}
         public Book GetBook()
         {
             return new Book
@@ -19,70 +25,14 @@ namespace APIProjectForTest
             };
         }
 
-        public List<Student> GetStudents()
+        public async Task<List<Student>> GetStudents([Service] IStudentRepository studentRepository)
         {
-            return new List<Student>
-            {
-                new Student()
-                {
-                   Id = 1,  
-                   Name="John",
-                   Age = 16,
-                   Gender="M",
-                   CourseName= Course.Math
-                },
-                 new Student()
-                {
-                   Id = 2,
-                   Name="Sunny",
-                   Age = 17,
-                   Gender="F",
-                   CourseName= Course.Biology
-                },
-                 new Student()
-                {
-                   Id = 3,
-                   Name="Mac",
-                   Age = 17,
-                   Gender="M",
-                   CourseName= Course.Commerce
-                }
-
-            };
+           return await studentRepository.GetStudentsAsync();
+            
         }
-        public Student GetStudent(int id)
+        public async Task<Student> GetStudent([Service] IStudentRepository studentRepository, int Id)
         {
-            var studentdata = new List<Student>
-            {
-                new Student()
-                {
-                   Id = 1,
-                   Name="John Buttler",
-                   Age = 16,
-                   Gender="M",
-                   CourseName= Course.Math
-                },
-                 new Student()
-                {
-                   Id = 2,
-                   Name="Sunny teris",
-                   Age = 17,
-                   Gender="F",
-                   CourseName= Course.Biology
-                },
-                 new Student()
-                {
-                   Id = 3,
-                   Name="Mac",
-                   Age = 17,
-                   Gender="M",
-                   CourseName= Course.Commerce
-                }
-
-            }.FirstOrDefault(x => x.Id == id);
-            if (studentdata != null)
-                return studentdata;
-            return null;
+          return  await studentRepository.GetStudentAsync(Id);
         }
     }
 }
